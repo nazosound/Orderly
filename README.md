@@ -36,7 +36,7 @@ _(Coming soon – Stay tuned!)_
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/orderly.git
+git clone https://github.com/nazosound/orderly.git
 cd orderly
 
 # Install dependencies
