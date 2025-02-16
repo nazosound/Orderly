@@ -1,4 +1,4 @@
-# 🏷️ Orderly – Smart Order Management System
+# 🏷️ Orderly – Smart Order Management System by Nariasdev
 
 🚀 **Orderly** is a modern and efficient **order management system** designed for **restaurants, small shops, and similar businesses**. Whether you're handling table orders in a restaurant or tracking purchases in a neighborhood store, **Orderly helps you stay organized and improve your workflow**.
 
