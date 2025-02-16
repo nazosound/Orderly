@@ -152,9 +152,9 @@ logs/
 *.sqlite
 
 # Configuration files
-appsettings.Development.json
-appsettings.Local.json
-secrets.json
+backend/appsettings.Development.json
+backend/appsettings.Local.json
+backend/secrets.json
 
 # IDE-specific files
 .vscode/
@@ -204,3 +204,7 @@ docker-compose.override.yml
 .idea/
 *.sln.iml
 .ReSharper*/
+backend/appsettings.Development.json
+backend/appsettings.Development.json
+backend/appsettings.json
+backend/appsettings.json
