@@ -27,10 +27,10 @@ _(Coming soon – Stay tuned!)_
 
 ### 🛠️ Tech Stack
 
-- **Frontend:** Angular (Latest version)  
-- **Backend:** Node.js with Express  
-- **Database:** PostgreSQL / Firebase (Optional)  
-- **Other:** TypeScript, RxJS, NgRx (Redux), Electron (for desktop apps)  
+- **Frontend:** Angular 19
+- **Backend:** C# .NET 9
+- **Database:** PostgreSQL / SQLServer
+- **Other:** TypeScript, RxJS, NgRx, Tailwind CSS
 
 ### 📦 Installation
 
