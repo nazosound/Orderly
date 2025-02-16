@@ -132,6 +132,75 @@ dist
 
 # .net
 
+# Build artifacts
 bin/
 obj/
-backend/.idea
+out/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs, database, and backups
+logs/
+*.log
+*.bak
+*.mdf
+*.ldf
+*.sqlite
+
+# Configuration files
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+# IDE-specific files
+.vscode/
+.idea/
+*.code-workspace
+
+# Rider
+*.sln.iml
+
+# Visual Studio
+.vs/
+
+# macOS/Linux specific
+.DS_Store
+*.swp
+*.swn
+*.swo
+
+# NuGet packages
+packages/
+*.nupkg
+.project.assets.json
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Entity Framework Migrations
+Migrations/
+
+# Generated files
+Generated_Code/
+
+# Publish and Deployment
+publish/
+node_modules/
+npm-debug.log
+dist/
+wwwroot/lib/
+
+# Docker-related
+docker-compose.override.yml
+.env
+.env.development
+.env.production
+
+# JetBrains Rider & ReSharper
+.idea/
+*.sln.iml
+.ReSharper*/
