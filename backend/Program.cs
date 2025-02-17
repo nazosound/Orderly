@@ -1,23 +1,53 @@
+using System.Text;
+using backend.Models;
+using backend.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
+
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+  
+builder.Services.AddControllers(); 
 builder.Services.AddOpenApi();
 
-var app = builder.Build();
+// NARIASDEV : JWT validator - configuration
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme )
+    .AddJwtBearer(jwtBearerOptions =>
+    {
+        jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateActor = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["JWT:Issuer"],
+            ValidAudience = builder.Configuration["JWT:Audience"],
+            ClockSkew = TimeSpan.Zero,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"]!))
+        };
+    }
+);
 
-// Configure the HTTP request pipeline.
+ 
+builder.Services.AddDbContext<OrderlyContext>((s) =>
+    s.UseSqlServer(builder.Configuration.GetConnectionString("dbContextStr")));
+
+builder.Services.AddTransient<AuthService>();
+builder.Services.AddTransient<TokenJwtService>();
+builder.Services.AddTransient<UserService>();
+builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+
+var app = builder.Build();
+ 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
