@@ -1,0 +1,21 @@
+<h2>Login</h2>
+<div class="justify-center flex items-center">
+
+
+  <form [formGroup]="loginForm" (ngSubmit)="login()" class="w-6/12">
+    <input class=" w-full rounded-sm border-1  border-l-black p-3 bg-white" type="text" formControlName="email"
+      placeholder="Username" />
+    <br>
+    <input class=" w-full rounded-sm border-1 border-l-black p-3 bg-white" type="password" formControlName="password"
+      placeholder="Password" />
+    <br>
+    <br>
+    <div class="w-full">
+      <button type="submit" [disabled]="loginForm.invalid || loading()"
+        class="bg-amber-500 text-black rounded-sm p-3 font-bold w-full hover:cursor-pointer hover:bg-amber-700 disabled:bg-red-500">
+        {{ loading() ? 'Logging in...' : 'Login' }}
+      </button>
+    </div>
+  </form>
+
+</div>

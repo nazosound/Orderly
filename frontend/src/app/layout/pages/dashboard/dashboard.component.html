@@ -1,0 +1,10 @@
+<h1 class="text-5xl" *ngIf="this.authService.getUser() as userData">
+  <div *ngIf="userData() as user">
+    Bienvenido {{user.email }}
+  </div>
+</h1>
+
+
+<button (click)="authService.logout()">
+  Cerrar sesión
+</button>
