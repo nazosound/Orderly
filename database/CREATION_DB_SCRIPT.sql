@@ -6,7 +6,7 @@
 
     insert into ENTITIES (entityName) values ('NARIASDEV')
     insert into USERS ([idEntity],email,userPassword,userName,userRole)
-    values (1,'nariasdev@gmail.com','pass123','Nicolas Arias','ADMINISTRADOR')
+    values (1,'narias.as@gmail.com','pass123','Nicolas Arias Venta','SALES')
 
 
 */
@@ -141,3 +141,7 @@ CREATE TABLE LOGGING
 
     foreign key ([idUser]) references USERS ([id]) ON DELETE SET NULL
 )
+go
+
+
+ 

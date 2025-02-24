@@ -1,4 +1,7 @@
 using System.Text;
+using backend.Repositories;
+using backend.Interfaces;
+using backend.Middleware;
 using backend.Models;
 using backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -12,7 +15,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 // NARIASDEV : JWT validator - configuration
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme )
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(jwtBearerOptions =>
     {
         jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters()
@@ -33,6 +36,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme )
 builder.Services.AddDbContext<OrderlyContext>((s) =>
     s.UseSqlServer(builder.Configuration.GetConnectionString("dbContextStr")));
 
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddTransient<AuthService>();
 builder.Services.AddTransient<TokenJwtService>();
 builder.Services.AddTransient<UserService>();
@@ -49,5 +53,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<ExceptionMiddleware>();
+
 app.MapControllers();
 app.Run();
