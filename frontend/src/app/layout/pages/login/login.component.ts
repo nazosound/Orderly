@@ -1,7 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { Router } from '@angular/router';
-import { UserInterface } from '../../../shared/models/user.model';
 import {
   FormBuilder,
   FormGroup,
@@ -9,6 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { catchError, of } from 'rxjs';
+import { ApiResponse } from '../../../shared/models/login.model';
 
 @Component({
   selector: 'app-login',
@@ -46,10 +46,11 @@ export class LoginComponent {
           return of(null);
         })
       )
-      .subscribe((user: UserInterface | null) => {
-        console.log('Usuario desde el login', user);
+      .subscribe((response: ApiResponse | null) => {
+        if (response?.result == false) {
+          alert(response.message);
+        }
         this.loading.set(false);
-        // this.router.navigate(['/dashboard']);
       });
   }
 }

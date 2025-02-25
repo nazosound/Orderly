@@ -1,9 +1,12 @@
-<h1 class="text-5xl" *ngIf="this.authService.getUser() as userData">
+<h1 class="text-5xl" *ngIf="userSignal() as userData">
   <div *ngIf="userData() as user">
     Bienvenido {{user.email }}
   </div>
 </h1>
 
+@for (user of (users$|async); track user.id){
+<h3>{{user.userName}}</h3>
+}
 
 <button (click)="authService.logout()">
   Cerrar sesión

@@ -20,7 +20,7 @@ public class TokenJwtService(IConfiguration config)
                 new Claim(ClaimTypes.Email, user.Email!),
                 new Claim(ClaimTypes.Role, user.UserRole)
             ]),
-            Expires = DateTime.UtcNow.AddHours(1),
+            Expires = DateTime.UtcNow.AddSeconds(30),
             SigningCredentials =
                 new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWT:SecretKey"]!)),
                     SecurityAlgorithms.HmacSha256)

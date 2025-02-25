@@ -23,15 +23,17 @@ public class AuthService(OrderlyContext context, TokenJwtService tokenJwtService
         userInfo.RefreshToken = refreshToken;
         userInfo.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
         await context.SaveChangesAsync();
+      
 
-        return new AuthResponse(new User
-        {
-            Id = userInfo.Id,
-            Email = userInfo.Email,
-            UserName = userInfo.UserName,
-            UserStatus = userInfo.UserStatus,
-            UserRole = userInfo.UserRole
-        }, accessToken, refreshToken);
+        return new AuthResponse(
+            new User
+            {
+                Id = userInfo.Id,
+                Email = userInfo.Email,
+                UserName = userInfo.UserName,
+                UserStatus = userInfo.UserStatus,
+                UserRole = userInfo.UserRole
+            }, accessToken, refreshToken);
     }
 
     public async Task<AuthResponse?> RefreshToken(string refreshToken)

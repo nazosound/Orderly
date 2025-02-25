@@ -1,15 +1,33 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
-import { NgIf } from '@angular/common';
+import { AsyncPipe, NgIf } from '@angular/common';
+import { UserService } from '../../../core/services/user.service';
+import { UserInterface } from '../../../shared/models/user.model';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [NgIf],
+  imports: [NgIf, AsyncPipe],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardComponent {
   authService = inject(AuthService);
+  userService = inject(UserService);
+  users$: Observable<UserInterface[] | null> = new Observable();
+  userSignal = computed(() => {
+    if (this.authService.isAuth()) {
+      this.users$ = this.userService.getUsers();
+    }
+    return this.authService.getUser();
+  });
 }

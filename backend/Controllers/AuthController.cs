@@ -16,23 +16,43 @@ public class AuthController(AuthService authService) : BaseController
     public async Task<IActionResult> Login([FromBody] LoginDTO loginRequest)
     {
         if (loginRequest.Email == null || loginRequest.Password == null)
-            return Unauthorized(new { message = "Orderly : Invalid data" });
+            return Ok(new { result = false, message = "Orderly : Invalid credentials" });
 
         var authResponse = await authService.Authenticate(loginRequest.Email, loginRequest.Password);
-        if (authResponse == null) return Unauthorized(new { message = "Orderly : Unauthorized" });
+        if (authResponse == null) return Ok(new { result = false, message = "Orderly : Invalid credentials" });
 
+        Response.Cookies.Append("refreshtoken", authResponse.RefreshToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None, 
+            Expires = DateTime.UtcNow.AddDays(7)
+        });
+        authResponse.RefreshToken = "";
         return Ok(authResponse);
     }
-    
+
     [HttpPost]
     [Route("refresh")]
-    public async Task<IActionResult> Refresh([FromBody] RefreshRequest request)
+    public async Task<IActionResult> Refresh()
     {
-        var response = await authService.RefreshToken(request.RefreshToken);
-        if (response == null)
-            return Unauthorized(new { message = "Invalid refresh token" });
+        var refreshToken = Request.Cookies["refreshtoken"];
+        if (refreshToken == null) return Forbid();
 
-        return Ok(response);
+        var authResponse = await authService.RefreshToken(refreshToken);
+        if (authResponse == null)
+            return Forbid();
+        
+        Response.Cookies.Append("refreshtoken", authResponse.RefreshToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None, 
+            Expires = DateTime.UtcNow.AddDays(7)
+        });
+        authResponse.RefreshToken = "";
+
+        return Ok(authResponse);
     }
 
     [Authorize]
