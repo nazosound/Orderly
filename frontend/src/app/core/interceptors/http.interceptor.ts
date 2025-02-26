@@ -3,12 +3,12 @@ import {
   HttpInterceptor,
   HttpRequest,
   HttpEvent,
-  HttpHandlerFn,
   HttpHandler,
 } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError, retry, switchMap, tap } from 'rxjs/operators';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
+import { LoginResponse } from '../../shared/models/login.model';
 
 @Injectable()
 export class TokenInterceptor implements HttpInterceptor {
@@ -18,36 +18,40 @@ export class TokenInterceptor implements HttpInterceptor {
     req: HttpRequest<unknown>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    let accessToken = localStorage.getItem('orderly-jwt');
-    let authReq = accessToken
-      ? req.clone({
-          headers: req.headers.set('Authorization', `Bearer ${accessToken}`),
-          withCredentials: true,
-        })
-      : req.clone({ withCredentials: true });
-
-    return next.handle(authReq).pipe(
+    return next.handle(this.sendRequest(req)).pipe(
       catchError((err) => {
-        if (err.status === 401) {
+        if (err.status === 401 && this.isNotRefreshRequest(req.url)) {
           return this.authService.refreshToken().pipe(
-            tap(() => {
-              accessToken = localStorage.getItem('orderly-jwt');
+            catchError((error) =>
+              throwError(() => {
+                console.log('Error with refresh', error.message);
+                return of(null);
+              })
+            ),
+            tap((res: LoginResponse | null) => {
+              if (res != null && res.result != false) {
+                this.authService.updateSession(res.token);
+              }
             }),
-            switchMap(() =>
-              next.handle(
-                req.clone({
-                  headers: req.headers.set(
-                    'Authorization',
-                    `Bearer ${accessToken}`
-                  ),
-                  withCredentials: true,
-                })
-              )
-            )
+            switchMap(() => next.handle(this.sendRequest(req)))
           );
         }
         return throwError(() => err);
       })
     );
+  }
+
+  private sendRequest(req: HttpRequest<unknown>) {
+    let accessToken = localStorage.getItem('orderly-jwt');
+    return accessToken
+      ? req.clone({
+          headers: req.headers.set('Authorization', `Bearer ${accessToken}`),
+          withCredentials: true,
+        })
+      : req.clone({ withCredentials: true });
+  }
+
+  private isNotRefreshRequest(url: string): boolean {
+    return url.indexOf('Auth/refresh') < 0;
   }
 }

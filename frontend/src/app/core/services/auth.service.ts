@@ -1,93 +1,68 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, of, throwError } from 'rxjs';
-import { catchError, delay, map, tap } from 'rxjs/operators';
-import { UserInterface } from '../../shared/models/user.model';
+import { catchError, tap } from 'rxjs/operators';
 import { ApiService } from './api.service';
-import { ApiResponse } from '../../shared/models/login.model';
+import { LoginResponse } from '../../shared/models/login.model';
+import { UserSession } from '../../shared/models/userSession.interface';
+import { UserInterface } from '../../shared/models/user.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  userIsAuthSignal = signal<boolean>(false);
+  isAuth = signal<boolean>(false);
   router = inject(Router);
   api = inject(ApiService);
-  user = signal<UserInterface | null>(this.loadUser());
 
-  isAuth(): boolean {
-    return this.userIsAuthSignal();
-  }
-  login(email: string, password: string): Observable<ApiResponse | null> {
-    return this.api
-      .httpPost<ApiResponse>('Auth/login', { email, password })
-      .pipe(
-        catchError((error) =>
-          throwError(() => {
-            console.log('Error From Data', error);
-            return of(null);
-          })
-        ),
-        tap((loginResponse: ApiResponse | null) => {
-          if (loginResponse != null && loginResponse.result != false) {
-            this.userIsAuthSignal.set(true);
-            localStorage.setItem(
-              'orderly-user',
-              JSON.stringify(loginResponse.user)
-            );
-            localStorage.setItem('orderly-jwt', loginResponse.token);
-            this.user.set(loginResponse.user);
-          }
-        })
-      );
+  session = signal<UserSession | null>(this.loadSession());
+  user = computed(() => this.session()?.user);
+  jwt = computed(() => this.session()?.jwt);
+
+  login(email: string, password: string): Observable<LoginResponse | null> {
+    return this.api.httpPost<LoginResponse>('Auth/login', { email, password });
   }
   logout(): void {
-    this.api
-      .httpPost<ApiResponse>('Auth/logout', null)
-      .pipe(
-        catchError((error) =>
-          throwError(() => {
-            console.log('Error From Data', error);
-            return of(null);
-          })
-        )
-      )
-      .subscribe((response: ApiResponse | null) => {
-        if (response != null) {
-          this.user.set(null);
-          localStorage.removeItem('orderly-user');
-          localStorage.removeItem('orderly-jwt');
-          this.userIsAuthSignal.set(false);
-          this.router.navigate(['/login']);
-        }
-      });
+    this.api.httpPost('Auth/logout', null).subscribe(() => {
+      this.removeSession();
+    });
   }
 
-  loadUser(): UserInterface | null {
-    const userStr = localStorage.getItem('orderly-user');
-    if (userStr) {
-      this.userIsAuthSignal.set(true);
+  refreshToken(): Observable<LoginResponse | null> {
+    return this.api.httpPost<LoginResponse>('Auth/refresh', null);
+  }
+
+  loadSession(): UserSession | null {
+    const sessionStr = localStorage.getItem('orderly-session');
+    if (!!sessionStr) {
+      this.isAuth.set(true);
     }
-    return userStr ? (JSON.parse(userStr) as UserInterface) : null;
+    return sessionStr ? (JSON.parse(sessionStr) as UserSession) : null;
   }
 
-  getUser() {
-    return this.user;
+  saveSession(user: UserInterface, jwt: string): void {
+    this.session.set({
+      user,
+      jwt,
+    });
+    localStorage.setItem('orderly-session', JSON.stringify(this.session()));
+    this.isAuth.set(true);
   }
 
-  refreshToken(): Observable<ApiResponse | null> {
-    return this.api.httpPost<ApiResponse>('Auth/refresh', null).pipe(
-      catchError((error) =>
-        throwError(() => {
-          console.log('Error From Data', error);
-          return of(null);
-        })
-      ),
-      tap((loginResponse: ApiResponse | null) => {
-        if (loginResponse != null && loginResponse.result != false) {
-          localStorage.setItem('orderly-jwt', loginResponse.token);
-        }
-      })
-    );
+  removeSession(): void {
+    this.session.set(null);
+    localStorage.removeItem('orderly-session');
+    this.isAuth.set(false);
+    this.router.navigate(['/login']);
+  }
+
+  updateSession(jwt: string): void {
+    this.session.update((currentSession: UserSession | null) => {
+      if (currentSession == null) return null;
+      return {
+        user: currentSession.user,
+        jwt,
+      };
+    });
   }
 }

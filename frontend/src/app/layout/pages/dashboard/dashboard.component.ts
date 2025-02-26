@@ -28,6 +28,6 @@ export class DashboardComponent {
     if (this.authService.isAuth()) {
       this.users$ = this.userService.getUsers();
     }
-    return this.authService.getUser();
+    return this.authService.user();
   });
 }

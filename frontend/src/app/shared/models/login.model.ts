@@ -1,6 +1,6 @@
 import { UserInterface } from './user.model';
 
-export interface ApiResponse {
+export interface LoginResponse {
   token: string;
   refreshToken: string;
   user: UserInterface;

@@ -8,7 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { catchError, of } from 'rxjs';
-import { ApiResponse } from '../../../shared/models/login.model';
+import { LoginResponse } from '../../../shared/models/login.model';
 
 @Component({
   selector: 'app-login',
@@ -39,18 +39,18 @@ export class LoginComponent {
     this.loading.set(true);
     this.authService
       .login(this.loginForm.value.email, this.loginForm.value.password)
-      .pipe(
-        catchError((error) => {
+      .subscribe({
+        next: (response: LoginResponse | null) => {
+          if (response?.result == false) {
+            alert(response.message);
+          }
+          this.loading.set(false);
+        },
+        error: (error) => {
           this.error.set(error.message);
           this.loading.set(false);
           return of(null);
-        })
-      )
-      .subscribe((response: ApiResponse | null) => {
-        if (response?.result == false) {
-          alert(response.message);
-        }
-        this.loading.set(false);
+        },
       });
   }
 }
