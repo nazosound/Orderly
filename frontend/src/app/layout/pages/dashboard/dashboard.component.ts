@@ -2,15 +2,16 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   OnInit,
+  signal,
 } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { AsyncPipe, NgIf } from '@angular/common';
 import { UserService } from '../../../core/services/user.service';
 import { UserInterface } from '../../../shared/models/user.model';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { Observable } from 'rxjs';
+import { catchError, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -23,11 +24,21 @@ import { Observable } from 'rxjs';
 export class DashboardComponent {
   authService = inject(AuthService);
   userService = inject(UserService);
-  users$: Observable<UserInterface[] | null> = new Observable();
-  userSignal = computed(() => {
-    if (this.authService.isAuth()) {
-      this.users$ = this.userService.getUsers();
-    }
-    return this.authService.user();
-  });
+  users$: Observable<UserInterface[]> = new Observable();
+  errorMessage = signal<string>('');
+
+  constructor() {
+    effect(() => {
+      if (this.authService.isAuth()) {
+        this.users$ = this.userService.getUsers().pipe(
+          catchError((err) => {
+            this.errorMessage.set(
+              `No tiene autorización para consultar los usuarios (${err.message})`
+            );
+            return [];
+          })
+        );
+      }
+    });
+  }
 }

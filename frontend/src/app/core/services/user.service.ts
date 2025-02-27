@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 export class UserService {
   api = inject(ApiService);
 
-  getUsers(): Observable<UserInterface[] | null> {
-    return this.api.httpGet<UserInterface[] | null>('User/getUsers');
+  getUsers(): Observable<UserInterface[]> {
+    return this.api.httpGet<UserInterface[]>('User/getUsers');
   }
 }

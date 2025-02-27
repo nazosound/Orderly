@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { Router } from '@angular/router';
 import {
@@ -7,17 +7,17 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { catchError, of } from 'rxjs';
 import { LoginResponse } from '../../../shared/models/login.model';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, NgIf],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   authService = inject(AuthService);
   router = inject(Router);
@@ -27,29 +27,38 @@ export class LoginComponent {
 
   constructor() {
     this.loginForm = this.fb.group({
-      email: ['', Validators.required],
-      password: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]],
     });
+  }
+  ngOnInit(): void {
+    if (this.authService.isAuth()) {
+      this.router.navigate(['/dashboard']);
+    }
   }
 
   login() {
     if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      this.error.set('Campos inválidos');
       return;
     }
     this.loading.set(true);
     this.authService
       .login(this.loginForm.value.email, this.loginForm.value.password)
       .subscribe({
-        next: (response: LoginResponse | null) => {
-          if (response?.result == false) {
-            alert(response.message);
+        next: (res: LoginResponse) => {
+          if (res.result == false) {
+            this.error.set(res.message);
+          } else {
+            this.authService.saveSession(res.user, res.token);
+            this.router.navigate(['/dashboard']);
           }
           this.loading.set(false);
         },
         error: (error) => {
           this.error.set(error.message);
           this.loading.set(false);
-          return of(null);
         },
       });
   }

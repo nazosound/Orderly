@@ -10,13 +10,13 @@ export class ApiService {
 
   http = inject(HttpClient);
 
-  httpGet<T>(method: string): Observable<T | null> {
+  httpGet<T>(method: string): Observable<T> {
     return this.http.get<T>(`${this.baseUrl}${method}`, {
       withCredentials: true,
     });
   }
 
-  httpPost<T>(method: string, payload: any): Observable<T | null> {
+  httpPost<T>(method: string, payload: any): Observable<T> {
     return this.http.post<T>(`${this.baseUrl}${method}`, payload, {
       withCredentials: true,
     });

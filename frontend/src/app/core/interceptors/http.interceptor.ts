@@ -22,16 +22,12 @@ export class TokenInterceptor implements HttpInterceptor {
       catchError((err) => {
         if (err.status === 401 && this.isNotRefreshRequest(req.url)) {
           return this.authService.refreshToken().pipe(
-            catchError((error) =>
-              throwError(() => {
-                console.log('Error with refresh', error.message);
-                return of(null);
-              })
-            ),
-            tap((res: LoginResponse | null) => {
-              if (res != null && res.result != false) {
-                this.authService.updateSession(res.token);
-              }
+            catchError((er) => {
+              if (er.status == 403) this.authService.removeSession();
+              return [];
+            }),
+            tap((res: LoginResponse) => {
+              this.authService.updateSession(res.token);
             }),
             switchMap(() => next.handle(this.sendRequest(req)))
           );
@@ -42,7 +38,7 @@ export class TokenInterceptor implements HttpInterceptor {
   }
 
   private sendRequest(req: HttpRequest<unknown>) {
-    let accessToken = localStorage.getItem('orderly-jwt');
+    let accessToken = this.authService.jwt();
     return accessToken
       ? req.clone({
           headers: req.headers.set('Authorization', `Bearer ${accessToken}`),
