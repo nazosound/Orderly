@@ -9,6 +9,7 @@ import {
 } from '@angular/forms';
 import { LoginResponse } from '../../../shared/models/login.model';
 import { NgIf } from '@angular/common';
+import { AppStateService } from '../../../core/services/appstate.service';
 
 @Component({
   selector: 'app-login',
@@ -20,6 +21,7 @@ import { NgIf } from '@angular/common';
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   authService = inject(AuthService);
+  appState = inject(AppStateService);
   router = inject(Router);
   fb = inject(FormBuilder);
   loading = signal<boolean>(false);

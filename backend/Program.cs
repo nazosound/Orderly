@@ -30,13 +30,23 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 IssuerSigningKey =
                     new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"]!))
             };
-             
+
         }
     );
 
+var dbEngine = builder.Configuration["DBENGINE"];
 
-builder.Services.AddDbContext<OrderlyContext>((s) =>
-    s.UseSqlServer(builder.Configuration.GetConnectionString("dbContextStr")));
+if (dbEngine == "POSTGRES")
+{
+    builder.Services.AddDbContext<OrderlyContext>((s) =>
+        s.UseNpgsql(builder.Configuration.GetConnectionString("dbContextStrPOSTGRESQL")));
+}
+else
+{
+    builder.Services.AddDbContext<OrderlyContext>((s) =>
+        s.UseSqlServer(builder.Configuration.GetConnectionString("dbContextStrMSSQL")));
+}
+
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddTransient<AuthService>();

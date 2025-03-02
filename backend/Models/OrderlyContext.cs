@@ -6,13 +6,12 @@ namespace backend.Models;
 
 public partial class OrderlyContext : DbContext
 {
-    public OrderlyContext()
-    {
-    }
+    private readonly IConfiguration _config;
 
-    public OrderlyContext(DbContextOptions<OrderlyContext> options)
+    public OrderlyContext(DbContextOptions<OrderlyContext> options, IConfiguration config)
         : base(options)
     {
+        _config = config;
     }
 
     public virtual DbSet<Account> Accounts { get; set; }
@@ -261,5 +260,26 @@ public partial class OrderlyContext : DbContext
                 .HasForeignKey(d => d.IdEntity)
                 .OnDelete(DeleteBehavior.SetNull);
         });
+
+
+
+        if (_config["DBENGINE"] == "POSTGRES")
+        {
+            /*
+            For postgresql it is better to user lowercase column and table names in EFC, so
+            the next lines change de way EFC uses names when build queries and forces it to
+            use lowercase.
+            */
+            foreach (var entity in modelBuilder.Model.GetEntityTypes())
+            {
+                entity.SetTableName(entity.GetTableName()!.ToLower());
+                foreach (var property in entity.GetProperties())
+                {
+                    property.SetColumnName(property.GetColumnName().ToLower());
+                }
+            }
+        }
+
+
     }
 }

@@ -32,7 +32,7 @@ CREATE TABLE USERS
     [userRole] varchar(15) not null,
     [userStatus] bit default 1,
     [refreshToken] varchar(150),
-    [refreshTokenExpiryTime] datetime,
+    [refreshTokenExpiry] datetime,
     [createdDate] datetime default getdate(),
     foreign key ([idEntity]) references ENTITIES ([id]) ON DELETE SET NULL
 )

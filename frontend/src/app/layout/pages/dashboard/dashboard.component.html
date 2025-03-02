@@ -1,19 +1,26 @@
-<h1 class="text-5xl" *ngIf="authService.user() as user">
-  Bienvenido {{user.email }}
-</h1>
+<div class="min-h-full">
+  <app-navbar />
+  <header class="bg-white shadow-sm">
+    <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <h1 class="text-3xl font-bold tracking-tight text-gray-900">Dashboard</h1>
+    </div>
+  </header>
+  <main>
+    <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <h1 class="text-5xl" *ngIf="authService.user() as user">
+        Bienvenido {{user.email }}
+      </h1>
 
-@if(authService.isAuth()){
-@for (user of (users$|async); track user.id){
-<h3>{{user.userName}}</h3>
-}
-}
-
-{{this.errorMessage()}}
-
-<br>
-
-<button (click)="authService.logout()">
-  Cerrar sesión
-</button>
-
-
+      @if(authService.isAuth()){
+      @for (user of (users$|async); track user.id){
+      <h3>{{user.userName}}</h3>
+      }
+      }
+      {{this.errorMessage()}}
+      <br>
+      <button (click)="authService.logout()">
+        Cerrar sesión
+      </button>
+    </div>
+  </main>
+</div>
