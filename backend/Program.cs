@@ -52,6 +52,7 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddTransient<AuthService>();
 builder.Services.AddTransient<TokenJwtService>();
 builder.Services.AddTransient<UserService>();
+builder.Services.AddTransient<CategoryService>();
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 builder.Services.AddCors(options =>
     options.AddPolicy(name: "OrderlyPolicy",

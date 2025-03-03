@@ -3,7 +3,7 @@ import { LoginComponent } from './layout/pages/login/login.component';
 import { AuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', component: LoginComponent },
+  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   {
     path: 'dashboard',
@@ -11,6 +11,8 @@ export const routes: Routes = [
       import('./layout/pages/dashboard/dashboard.component').then(
         (m) => m.DashboardComponent
       ),
+    loadChildren: () =>
+      import('./shared/routes/dashboard.routes').then((m) => m.dashboardRoutes),
     canActivate: [AuthGuard],
   },
 ];

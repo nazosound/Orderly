@@ -18,7 +18,8 @@ public class TokenJwtService(IConfiguration config)
             Subject = new ClaimsIdentity([
                 new Claim(ClaimTypes.Name, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email!),
-                new Claim(ClaimTypes.Role, user.UserRole)
+                new Claim(ClaimTypes.Role, user.UserRole),
+                new Claim(ClaimTypes.NameIdentifier, user.IdEntity.ToString()!)
             ]),
             Expires = DateTime.UtcNow.AddSeconds(30),
             SigningCredentials =

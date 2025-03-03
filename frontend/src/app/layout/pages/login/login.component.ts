@@ -42,7 +42,7 @@ export class LoginComponent implements OnInit {
   login() {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
-      this.error.set('Campos inválidos');
+      this.error.set('Invalid Fields');
       return;
     }
     this.loading.set(true);

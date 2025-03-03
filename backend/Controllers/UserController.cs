@@ -35,7 +35,7 @@ public class UserController(UserService userService) : BaseController
     public async Task<IActionResult> UpdateUser([FromBody] User? user)
     {
         if (user == null) return BadRequest();
-        if (user.Id != UserId && UserRole != "ADMINISTRADOR") return Forbid();
+        if (user.Id != UserId && UserRole != CONSTANTS.ADMIN) return Forbid();
         if (!ModelState.IsValid) return BadRequest(ModelState);
         var resultUpdateUser = await userService.UpdateUser(user);
         return resultUpdateUser is not null ? Ok(resultUpdateUser) : BadRequest();
