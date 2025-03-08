@@ -8,8 +8,9 @@ import {
 } from '@angular/forms';
 import { CategoryService } from '../../../core/services/category.service';
 import { AsyncPipe, NgFor, NgIf } from '@angular/common';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { CategoryInterface } from '../../../shared/models/category.interface';
+import { PaginationInterface } from '../../../shared/models/pagination.interface';
 
 @Component({
   selector: 'app-category',
@@ -24,7 +25,9 @@ export class CategoryComponent {
   categoryService = inject(CategoryService);
   error = signal<string>('');
   loading = signal<boolean>(false);
-  categories$: Observable<CategoryInterface[]>;
+  categories$: Observable<PaginationInterface<CategoryInterface[]>>;
+  totalPages = signal<number>(0);
+  currentPage = signal<number>(1);
 
   constructor() {
     this.categoryForm = this.fb.group({
@@ -32,7 +35,12 @@ export class CategoryComponent {
       categoryName: ['', [Validators.required, Validators.maxLength(100)]],
       categoryStatus: [false],
     });
-    this.categories$ = this.categoryService.getCategories();
+    this.categories$ = this.categoryService.getAllCategories().pipe(
+      tap((result) => {
+        this.totalPages.set(result.totalPages);
+        this.loading.set(false);
+      })
+    );
   }
 
   saveCategory(): void {
@@ -51,12 +59,25 @@ export class CategoryComponent {
           categoryName: '',
           categoryStatus: false,
         });
-        this.categoryService.reloadCategories();
+        this.currentPage.set(1);
+        this.categoryService.reloadCategories(1);
       },
       error: (error) => {
         this.error.set(error.message);
         this.loading.set(false);
       },
     });
+  }
+
+  setPage(newpage: number) {
+    this.currentPage.update((prev) => {
+      if (this.totalPages() < prev + newpage) {
+        return prev;
+      }
+      return prev + newpage == 0 ? 1 : prev + newpage;
+    });
+
+    this.loading.set(true);
+    this.categoryService.reloadCategories(this.currentPage());
   }
 }

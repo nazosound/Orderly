@@ -19,17 +19,17 @@ public class AuthController(AuthService authService) : BaseController
             return Ok(new { result = false, message = "Orderly : Invalid credentials" });
 
         var authResponse = await authService.Authenticate(loginRequest.Email, loginRequest.Password);
-        if (authResponse == null) return Ok(new { result = false, message = "Orderly : Invalid credentials" });
+        if (authResponse == null) return End(CONSTANTS.FORBID);
 
         Response.Cookies.Append("refreshtoken", authResponse.RefreshToken, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
-            SameSite = SameSiteMode.None, 
+            SameSite = SameSiteMode.None,
             Expires = DateTime.UtcNow.AddDays(7)
         });
         authResponse.RefreshToken = "";
-        return Ok(authResponse);
+        return End(authResponse);
     }
 
     [HttpPost]
@@ -42,17 +42,17 @@ public class AuthController(AuthService authService) : BaseController
         var authResponse = await authService.RefreshToken(refreshToken);
         if (authResponse == null)
             return Forbid();
-        
+
         Response.Cookies.Append("refreshtoken", authResponse.RefreshToken, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
-            SameSite = SameSiteMode.None, 
+            SameSite = SameSiteMode.None,
             Expires = DateTime.UtcNow.AddDays(7)
         });
         authResponse.RefreshToken = "";
 
-        return Ok(authResponse);
+        return End(authResponse);
     }
 
     [Authorize]
@@ -62,9 +62,9 @@ public class AuthController(AuthService authService) : BaseController
     {
         var userId = UserId;
         if (userId == null)
-            return BadRequest("User not found");
+            return End(CONSTANTS.NOTFOUND);
 
         await authService.Logout(userId.Value);
-        return Ok(new { message = "Logged out successfully" });
+        return End();
     }
 }

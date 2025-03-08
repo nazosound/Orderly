@@ -1,16 +1,19 @@
-﻿using backend.Interfaces;
+﻿using backend.DTOs;
+using backend.Interfaces;
 using backend.Models;
 
 namespace backend.Services
 {
     public class CategoryService(IRepository<Category> categoryRepository)
     {
-        public async Task<List<Category>> GetCategories(bool onlyActive = false)
+        public async Task<PaginatedList<List<Category>>> GetAllCategories(int page)
         {
-            if (onlyActive)
-                return await categoryRepository.GetWithConditionAsync(w => w.CategoryStatus == true, o => o.CategoryName);
-            else
-                return (await categoryRepository.GetAllAsync()).OrderBy(o => o.CategoryName).ToList();
+            return await categoryRepository.GetListPaginatedAsync(page, CONSTANTS.PAGESIZE, orderBy: o => o.CategoryName);
+        }
+
+        public async Task<List<Category>> GetActiveCategories()
+        {
+            return await categoryRepository.GetWithConditionAsync(w => w.CategoryStatus == true, o => o.CategoryName);
         }
 
         public async Task<Category?> CreateCategory(Category category)

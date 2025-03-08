@@ -6,7 +6,7 @@ import {
   signal,
 } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
-import {  TitleCasePipe } from '@angular/common';
+import { TitleCasePipe } from '@angular/common';
 import { UserService } from '../../../core/services/user.service';
 import { UserInterface } from '../../../shared/models/user.model';
 import { catchError, Observable } from 'rxjs';

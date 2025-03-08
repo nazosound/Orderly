@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using backend.DTOs;
 using backend.Interfaces;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -23,13 +24,13 @@ public class Repository<T> : IRepository<T> where T : class
         Expression<Func<T, bool>> predicate,
         Expression<Func<T, object>>? orderBy = null)
     {
-        if(orderBy is not null)
+        if (orderBy is not null)
             return await _dbSet.Where(predicate).OrderBy(orderBy).ToListAsync();
         return await _dbSet.Where(predicate).ToListAsync();
     }
- 
 
-    public async Task<(List<T> Items, int TotalPages)> GetListPaginatedAsync<TKey>(
+
+    public async Task<PaginatedList<List<T>>> GetListPaginatedAsync(
         int pageNumber,
         int pageSize,
         Expression<Func<T, bool>>? predicate = null,
@@ -43,12 +44,11 @@ public class Repository<T> : IRepository<T> where T : class
         if (orderBy is not null)
             query = ascending == true ? query.OrderBy(orderBy) : query.OrderByDescending(orderBy);
 
+        var totalPages = await query.CountAsync();
+
         query = query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
-        
-        return (
-                await query.ToListAsync(), 
-                Convert.ToInt32(Math.Ceiling(Convert.ToDouble(await query.CountAsync()) / pageSize))
-            );
+
+        return new PaginatedList<List<T>>(Convert.ToInt32(Math.Ceiling(Convert.ToDouble(totalPages) / pageSize)), await query.ToListAsync());
     }
 
     public async Task<T> AddAsync(T entity)

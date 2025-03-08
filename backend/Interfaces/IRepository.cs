@@ -1,3 +1,4 @@
+using backend.DTOs;
 using System.Linq.Expressions;
 
 namespace backend.Interfaces;
@@ -13,10 +14,10 @@ public interface IRepository<T> where T : class
     Task<List<T>> GetWithConditionAsync(Expression<Func<T, bool>> predicate,
         Expression<Func<T, object>>? orderBy = null);
 
-    Task<(List<T> Items, int TotalPages)> GetListPaginatedAsync<TKey>(int pageNumber,
+    Task<PaginatedList<List<T>>> GetListPaginatedAsync(int pageNumber,
         int pageSize,
         Expression<Func<T, bool>>? predicate = null,
         Expression<Func<T, object>>? orderBy = null,
         bool? ascending = true);
- 
+
 }

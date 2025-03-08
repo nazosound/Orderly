@@ -11,15 +11,20 @@ namespace backend.Controllers
     public class CategoryController(CategoryService categoryService) : BaseController
     {
         [HttpGet]
-        [Authorize(Roles = $"{CONSTANTS.ADMIN},{CONSTANTS.SALES}")]
-        [Route("getCategories")]
-        public async Task<IActionResult> GetCategories(bool onlyActive = false)
+        [Authorize(Roles = $"{CONSTANTS.ADMIN}")]
+        [Route("getAllCategories")]
+        public async Task<IActionResult> GetAllCategories(int page = 1)
         {
-            if (onlyActive == false && UserRole == CONSTANTS.SALES)
-            {
-                return Forbid();
-            }
-            return Ok(await categoryService.GetCategories(onlyActive));
+            var result = await categoryService.GetAllCategories(page);
+            return End(true, "", result);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = $"{CONSTANTS.ADMIN}{CONSTANTS.SALES}")]
+        [Route("getCategories")]
+        public async Task<IActionResult> getCategories()
+        {
+            return End(true, "", await categoryService.GetActiveCategories());
         }
 
         [HttpPost]
@@ -27,18 +32,13 @@ namespace backend.Controllers
         [Route("addCategory")]
         public async Task<IActionResult> AddCategory([FromBody] Category? category)
         {
-            if (category is null) return BadRequest();
-
+            if (category is null) return End(CONSTANTS.BADREQUEST);
             category.IdEntity = UserEntityId;
-
             if (category.Id > 0)
             {
-                var resultUpdateCategory = await categoryService.UpdateCategory(category);
-                return resultUpdateCategory is not null ? Ok(resultUpdateCategory) : BadRequest();
+                return End(await categoryService.UpdateCategory(category));
             }
-
-            var resultCreateCategory = await categoryService.CreateCategory(category);
-            return resultCreateCategory is not null ? Ok(resultCreateCategory) : BadRequest();
+            return End(await categoryService.CreateCategory(category));
         }
 
         [HttpPost]
@@ -46,9 +46,9 @@ namespace backend.Controllers
         [Route("updateCategory")]
         public async Task<IActionResult> UpdateCategory([FromBody] Category? category)
         {
-            if (category is null) return BadRequest();
+            if (category is null) return End(CONSTANTS.BADREQUEST);
             var resultCreateCategory = await categoryService.UpdateCategory(category);
-            return resultCreateCategory is not null ? Ok(resultCreateCategory) : BadRequest();
+            return End(resultCreateCategory);
         }
     }
 }

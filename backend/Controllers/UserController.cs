@@ -15,7 +15,7 @@ public class UserController(UserService userService) : BaseController
     [Route("getUsers")]
     public async Task<IActionResult> GetUsers()
     {
-        return Ok(await userService.GetAllUsers(UserId!.Value));
+        return End(await userService.GetAllUsers(UserId!.Value));
     }
 
     [HttpPost]
@@ -26,7 +26,7 @@ public class UserController(UserService userService) : BaseController
         if (user == null) return BadRequest();
         if (!ModelState.IsValid) return BadRequest(ModelState);
         var resultAddUser = await userService.CreateUser(user);
-        return resultAddUser is not null ? Ok(resultAddUser) : BadRequest();
+        return End(resultAddUser);
     }
 
     [HttpPost]
@@ -35,10 +35,9 @@ public class UserController(UserService userService) : BaseController
     public async Task<IActionResult> UpdateUser([FromBody] User? user)
     {
         if (user == null) return BadRequest();
-        if (user.Id != UserId && UserRole != CONSTANTS.ADMIN) return Forbid();
-        if (!ModelState.IsValid) return BadRequest(ModelState);
-        var resultUpdateUser = await userService.UpdateUser(user);
-        return resultUpdateUser is not null ? Ok(resultUpdateUser) : BadRequest();
+        if (user.Id != UserId && UserRole != CONSTANTS.ADMIN) return End(CONSTANTS.FORBID);
+        if (!ModelState.IsValid) return End(CONSTANTS.BADREQUEST);
+        return End(await userService.UpdateUser(user));
     }
 
     [HttpGet]
@@ -46,7 +45,6 @@ public class UserController(UserService userService) : BaseController
     [Route("getUser")]
     public async Task<IActionResult> GetUser()
     {
-        var user = await userService.GetUserById(UserId!.Value);
-        return user is not null ? Ok(user) : BadRequest();
+        return End(await userService.GetUserById(UserId!.Value));
     }
 }

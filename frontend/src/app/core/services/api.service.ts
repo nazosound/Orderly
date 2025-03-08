@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
+import { EndResultInterface } from '../../shared/models/endresult.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -10,15 +11,19 @@ export class ApiService {
 
   http = inject(HttpClient);
 
-  httpGet<T>(method: string): Observable<T> {
-    return this.http.get<T>(`${this.baseUrl}${method}`, {
+  httpGet<T>(method: string): Observable<EndResultInterface<T>> {
+    return this.http.get<EndResultInterface<T>>(`${this.baseUrl}${method}`, {
       withCredentials: true,
     });
   }
 
-  httpPost<T>(method: string, payload: any): Observable<T> {
-    return this.http.post<T>(`${this.baseUrl}${method}`, payload, {
-      withCredentials: true,
-    });
+  httpPost<T>(method: string, payload: any): Observable<EndResultInterface<T>> {
+    return this.http.post<EndResultInterface<T>>(
+      `${this.baseUrl}${method}`,
+      payload,
+      {
+        withCredentials: true,
+      }
+    );
   }
 }

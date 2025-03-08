@@ -1,10 +1,11 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { ApiService } from './api.service';
 import { LoginResponse } from '../../shared/models/login.model';
 import { UserSession } from '../../shared/models/userSession.interface';
 import { UserInterface } from '../../shared/models/user.model';
+import { EndResultInterface } from '../../shared/models/endresult.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -19,7 +20,16 @@ export class AuthService {
   isAuth = computed(() => this.session() != null);
 
   login(email: string, password: string): Observable<LoginResponse> {
-    return this.api.httpPost<LoginResponse>('Auth/login', { email, password });
+    return this.api
+      .httpPost<LoginResponse>('Auth/login', { email, password })
+      .pipe(
+        map((result: EndResultInterface<LoginResponse>) => {
+          if (result.result === false) {
+            throw new Error(result.message);
+          }
+          return result.data;
+        })
+      );
   }
   logout(): void {
     this.api.httpPost('Auth/logout', null).subscribe(() => {
@@ -28,7 +38,14 @@ export class AuthService {
   }
 
   refreshToken(): Observable<LoginResponse> {
-    return this.api.httpPost<LoginResponse>('Auth/refresh', null);
+    return this.api.httpPost<LoginResponse>('Auth/refresh', null).pipe(
+      map((result: EndResultInterface<LoginResponse>) => {
+        if (result.result === false) {
+          throw new Error(result.message);
+        }
+        return result.data;
+      })
+    );
   }
 
   loadSession(): UserSession | null {
