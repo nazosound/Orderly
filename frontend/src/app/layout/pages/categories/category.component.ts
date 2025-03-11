@@ -11,12 +11,21 @@ import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Observable, tap } from 'rxjs';
 import { CategoryInterface } from '../../../shared/models/category.interface';
 import { PaginationInterface } from '../../../shared/models/pagination.interface';
+import { AppButtonComponent } from '../../../components/appbutton.component';
+import { AppModalComponent } from '../../../components/appmodal.component';
 
 @Component({
   selector: 'app-category',
   templateUrl: './category.component.html',
   styleUrls: ['./category.component.css'],
-  imports: [ReactiveFormsModule, NgFor, AsyncPipe, NgIf],
+  imports: [
+    ReactiveFormsModule,
+    NgFor,
+    AsyncPipe,
+    NgIf,
+    AppButtonComponent,
+    AppModalComponent,
+  ],
 })
 export class CategoryComponent {
   categoryForm: FormGroup;
@@ -28,7 +37,7 @@ export class CategoryComponent {
   categories$: Observable<PaginationInterface<CategoryInterface[]>>;
   totalPages = signal<number>(0);
   currentPage = signal<number>(1);
-
+  isModalOpen = signal<boolean>(false);
   constructor() {
     this.categoryForm = this.fb.group({
       id: [0],
@@ -60,6 +69,7 @@ export class CategoryComponent {
           categoryStatus: false,
         });
         this.currentPage.set(1);
+        this.isModalOpen.set(false);
         this.categoryService.reloadCategories(1);
       },
       error: (error) => {
@@ -79,5 +89,10 @@ export class CategoryComponent {
 
     this.loading.set(true);
     this.categoryService.reloadCategories(this.currentPage());
+  }
+
+  showModal() {
+    console.log('show modal');
+    this.isModalOpen.set(true);
   }
 }
