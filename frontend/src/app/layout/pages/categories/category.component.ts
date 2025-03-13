@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { AppStateService } from '../../../core/services/appstate.service';
 import {
   FormBuilder,
@@ -13,6 +13,7 @@ import { CategoryInterface } from '../../../shared/models/category.interface';
 import { PaginationInterface } from '../../../shared/models/pagination.interface';
 import { AppButtonComponent } from '../../../components/appbutton.component';
 import { AppModalComponent } from '../../../components/appmodal.component';
+import { Constants } from '../../../shared/enums/constants';
 
 @Component({
   selector: 'app-category',
@@ -28,48 +29,36 @@ import { AppModalComponent } from '../../../components/appmodal.component';
   ],
 })
 export class CategoryComponent {
+  // private variables Region
   categoryForm: FormGroup;
+  categories$: Observable<PaginationInterface<CategoryInterface[]>>;
+  // Services Region
   fb = inject(FormBuilder);
   appState = inject(AppStateService);
   categoryService = inject(CategoryService);
+  // Signal Region
   error = signal<string>('');
   loading = signal<boolean>(false);
-  categories$: Observable<PaginationInterface<CategoryInterface[]>>;
   totalPages = signal<number>(0);
   currentPage = signal<number>(1);
   isModalOpen = signal<boolean>(false);
+
   constructor() {
-    this.categoryForm = this.fb.group({
-      id: [0],
-      categoryName: ['', [Validators.required, Validators.maxLength(100)]],
-      categoryStatus: [false],
-    });
-    this.categories$ = this.categoryService.getAllCategories().pipe(
-      tap((result) => {
-        this.totalPages.set(result.totalPages);
-        this.loading.set(false);
-      })
-    );
+    this.categoryForm = this.fb.group(this.initForm());
+    this.categories$ = this.getAllCategories();
   }
 
+  // Use Cases
   saveCategory(): void {
     if (this.categoryForm.invalid) {
       this.categoryForm.markAllAsTouched();
-      this.error.set('Invalid Fields');
+      this.error.set(Constants.INVALID_FIELDS);
       return;
     }
     this.loading.set(true);
     this.categoryService.saveCategory(this.categoryForm.value).subscribe({
       next: () => {
-        this.error.set('');
-        this.loading.set(false);
-        this.categoryForm.reset({
-          id: 0,
-          categoryName: '',
-          categoryStatus: false,
-        });
-        this.currentPage.set(1);
-        this.isModalOpen.set(false);
+        this.resetStatus();
         this.categoryService.reloadCategories(1);
       },
       error: (error) => {
@@ -78,7 +67,15 @@ export class CategoryComponent {
       },
     });
   }
-
+  getAllCategories() {
+    return this.categoryService.getAllCategories().pipe(
+      tap((result) => {
+        this.totalPages.set(result.totalPages);
+        this.loading.set(false);
+      })
+    );
+  }
+  // Control
   setPage(newpage: number) {
     this.currentPage.update((prev) => {
       if (this.totalPages() < prev + newpage) {
@@ -86,13 +83,25 @@ export class CategoryComponent {
       }
       return prev + newpage == 0 ? 1 : prev + newpage;
     });
-
     this.loading.set(true);
     this.categoryService.reloadCategories(this.currentPage());
   }
-
-  showModal() {
-    console.log('show modal');
-    this.isModalOpen.set(true);
+  initForm() {
+    return {
+      id: [0],
+      categoryName: ['', [Validators.required, Validators.maxLength(100)]],
+      categoryStatus: [false],
+    };
+  }
+  resetStatus() {
+    this.error.set('');
+    this.loading.set(false);
+    this.currentPage.set(1);
+    this.isModalOpen.set(false);
+    this.categoryForm.reset({
+      id: 0,
+      categoryName: '',
+      categoryStatus: false,
+    });
   }
 }
