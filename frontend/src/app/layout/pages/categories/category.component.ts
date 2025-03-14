@@ -11,9 +11,10 @@ import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Observable, tap } from 'rxjs';
 import { CategoryInterface } from '../../../shared/models/category.interface';
 import { PaginationInterface } from '../../../shared/models/pagination.interface';
-import { AppButtonComponent } from '../../../components/appbutton.component';
-import { AppModalComponent } from '../../../components/appmodal.component';
+import { AppButtonComponent } from '../../components/shared/appbutton.component';
+import { AppModalComponent } from '../../components/shared/appmodal.component';
 import { Constants } from '../../../shared/enums/constants';
+import { PaginationComponent } from '../../components/shared/pagination.component';
 
 @Component({
   selector: 'app-category',
@@ -21,11 +22,11 @@ import { Constants } from '../../../shared/enums/constants';
   styleUrls: ['./category.component.css'],
   imports: [
     ReactiveFormsModule,
-    NgFor,
     AsyncPipe,
     NgIf,
     AppButtonComponent,
     AppModalComponent,
+    PaginationComponent
   ],
 })
 export class CategoryComponent {

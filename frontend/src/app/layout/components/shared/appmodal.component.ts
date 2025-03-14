@@ -6,9 +6,9 @@ import { Component, input, output } from '@angular/core';
   selector: 'app-modal',
   template: `
     <!-- Modal Background -->
-    <div
+    <div 
       *ngIf="isOpen()"
-      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-5"
+      class="modal-animated fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-5"
       (click)="closeModal()"
     >
       <!-- Modal Container -->
@@ -23,7 +23,7 @@ import { Component, input, output } from '@angular/core';
             (click)="closeModal()"
             class="text-gray-600 hover:text-red-500"
           >
-            ✖
+            <i class="fa fa-close"></i>
           </button>
         </div>
 
@@ -66,8 +66,8 @@ import { Component, input, output } from '@angular/core';
         }
       }
 
-      div[*ngIf] {
-        animation: fadeIn 0.2s ease-in-out, scaleUp 0.2s ease-in-out;
+      div.modal-animated {
+        animation: fadeIn 0.1s ease-in-out, scaleUp 0.1s ease-in-out;
       }
     `,
   ],
