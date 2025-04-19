@@ -1,14 +1,14 @@
-import { Component, effect, inject, input, model, output, signal } from "@angular/core";
-import { AppModalComponent } from "../../../components/shared/appmodal.component";
+import { ChangeDetectionStrategy, Component, effect, inject, input, model, output, signal } from "@angular/core";
 import {
     FormBuilder,
     FormGroup,
     ReactiveFormsModule,
     Validators,
 } from '@angular/forms';
-import { Constants } from "../../../../shared/enums/constants";
-import { CategoryService } from "../../../../core/services/category.service";
-import { CategoryInterface } from "../../../../shared/models/category.interface";
+import { Constants } from "@/shared/enums/constants";
+import { CategoryInterface } from "@/shared/models/category.interface";
+import { AppModalComponent } from "@/layout/components/shared/appmodal.component";
+import { CategoryService } from "@/core/services/category.service";
 
 @Component({
     selector: 'app-category-modal',
@@ -17,6 +17,7 @@ import { CategoryInterface } from "../../../../shared/models/category.interface"
         AppModalComponent,
         ReactiveFormsModule
     ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoryModalComponent {
 

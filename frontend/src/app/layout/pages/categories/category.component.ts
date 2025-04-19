@@ -1,17 +1,14 @@
 import { Component, inject, model, signal } from '@angular/core';
-import { AppStateService } from '../../../core/services/appstate.service';
-
-import { CategoryService } from '../../../core/services/category.service';
-import { AsyncPipe, NgFor, NgIf, NgStyle } from '@angular/common';
+import { AsyncPipe, NgIf, NgStyle } from '@angular/common';
 import { Observable, tap } from 'rxjs';
-import { CategoryInterface } from '../../../shared/models/category.interface';
-import { PaginationInterface } from '../../../shared/models/pagination.interface';
-import { AppButtonComponent } from '../../components/shared/appbutton.component';
-import { AppModalComponent } from '../../components/shared/appmodal.component';
-import { Constants } from '../../../shared/enums/constants';
-import { PaginationComponent } from '../../components/shared/pagination.component';
+import { FormsModule } from '@angular/forms';
+import { AppButtonComponent } from '@/layout/components/shared/appbutton.component';
+import { PaginationComponent } from '@/layout/components/shared/pagination.component';
 import { CategoryModalComponent } from './modal-category/category-modal.component';
-import { FormsModule, NgModel } from '@angular/forms';
+import { PaginationInterface } from '@/shared/models/pagination.interface';
+import { AppStateService } from '@/core/services/appstate.service';
+import { CategoryInterface } from '@/shared/models/category.interface';
+import { CategoryService } from '@/core/services/category.service';
 
 @Component({
   selector: 'app-category',
@@ -28,24 +25,22 @@ import { FormsModule, NgModel } from '@angular/forms';
   ],
 })
 export class CategoryComponent {
-  // private variables Region
   categories$: Observable<PaginationInterface<CategoryInterface[]>>;
-  // Services Region
+  //--
   appState = inject(AppStateService);
   categoryService = inject(CategoryService);
-  // Signal Region
+  //--
   loading = signal<boolean>(false);
   totalPages = signal<number>(0);
   currentPage = signal<number>(1);
   isModalOpen = signal<boolean>(false);
   selectedCategory = signal<CategoryInterface | null>(null);
+  //--
   search = model('');
 
   constructor() {
     this.categories$ = this.getAllCategories();
   }
-
-  // Use Cases
 
   getAllCategories() {
     return this.categoryService.getAllCategories().pipe(
@@ -55,7 +50,6 @@ export class CategoryComponent {
       })
     );
   }
-  // Control
   setPage(newpage: number) {
     this.currentPage.update((prev) => {
       if (this.totalPages() < prev + newpage) {
@@ -67,6 +61,7 @@ export class CategoryComponent {
     this.loading.set(true);
     this.categoryService.reloadCategories(this.currentPage(), this.search());
   }
+
   selectCategory(category: CategoryInterface) {
     this.selectedCategory.set(category);
     this.isModalOpen.set(true);

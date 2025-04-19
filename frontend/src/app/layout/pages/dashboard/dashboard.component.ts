@@ -6,7 +6,6 @@ import {
   signal,
 } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
-import { TitleCasePipe } from '@angular/common';
 import { UserService } from '../../../core/services/user.service';
 import { UserInterface } from '../../../shared/models/user.model';
 import { catchError, Observable } from 'rxjs';
@@ -17,7 +16,7 @@ import { AppStateService } from '../../../core/services/appstate.service';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [NavbarComponent, RouterModule, TitleCasePipe],
+  imports: [NavbarComponent, RouterModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
