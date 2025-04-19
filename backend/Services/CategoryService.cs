@@ -1,14 +1,18 @@
 ﻿using backend.DTOs;
 using backend.Interfaces;
 using backend.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Services
 {
     public class CategoryService(IRepository<Category> categoryRepository)
     {
-        public async Task<PaginatedList<List<Category>>> GetAllCategories(int page)
+        public async Task<PaginatedList<List<Category>>> GetAllCategories(int page, string search)
         {
-            return await categoryRepository.GetListPaginatedAsync(page, CONSTANTS.PAGESIZE, orderBy: o => o.CategoryName);
+            return await categoryRepository
+                .GetListPaginatedAsync(page, CONSTANTS.PAGESIZE,
+                    orderBy: o => o.CategoryName,
+                    predicate: (w => w.CategoryName.ToLower().Contains(search.ToLower()) ));
         }
 
         public async Task<List<Category>> GetActiveCategories()

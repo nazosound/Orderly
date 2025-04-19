@@ -1,38 +1,15 @@
 import { NgIf } from '@angular/common';
-import { Component, input, output } from '@angular/core';
+import { Component, input, model, output } from '@angular/core';
+import { DialogModule } from 'primeng/dialog';
+
 
 @Component({
-  imports: [NgIf],
+  imports: [NgIf, DialogModule],
   selector: 'app-modal',
   template: `
     <!-- Modal Background -->
-    <div 
-      *ngIf="isOpen()"
-      class="modal-animated fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-5"
-      (click)="closeModal()"
-    >
-      <!-- Modal Container -->
-      <div
-        class="bg-white p-6 rounded-lg shadow-lg w-96"
-        (click)="$event.stopPropagation()"
-      >
-        <!-- Modal Header -->
-        <div class="flex justify-between items-center border-b pb-2">
-          <h2 class="text-lg font-semibold">{{ title() }}</h2>
-          <button
-            (click)="closeModal()"
-            class="text-gray-600 hover:text-red-500"
-          >
-            <i class="fa fa-close"></i>
-          </button>
-        </div>
-
-        <!-- Modal Content -->
-        <div class="mt-4">
-          <ng-content></ng-content>
-        </div>
-
-        <!-- Modal Footer -->
+    <p-dialog [header]="title()" [styleClass]="widthClass()" [position]="position()" [draggable]="false" [modal]="true" [(visible)]="isOpen">
+        <ng-content></ng-content>
         <div class="mt-4 flex justify-end">
           <button
             *ngIf="showButton()"
@@ -41,42 +18,17 @@ import { Component, input, output } from '@angular/core';
           >
             Close
           </button>
-        </div>
-      </div>
-    </div>
+        </div> 
+    </p-dialog>
   `,
-  styles: [
-    `
-      /* Agrega una animación de entrada opcional */
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
-      }
-
-      @keyframes scaleUp {
-        from {
-          transform: scale(0.9);
-        }
-        to {
-          transform: scale(1);
-        }
-      }
-
-      div.modal-animated {
-        animation: fadeIn 0.1s ease-in-out, scaleUp 0.1s ease-in-out;
-      }
-    `,
-  ],
 })
 export class AppModalComponent {
   title = input<string>('');
-  isOpen = input<boolean>(false);
+  isOpen = model(false);
   close = output();
+  widthClass = input<string>('w-4/12');
   showButton = input<boolean>(true);
+  position = input<"center" | "top" | "bottom" | "left" | "right" | "topleft" | "topright" | "bottomleft" | "bottomright">('top');
 
   closeModal() {
     this.close.emit();

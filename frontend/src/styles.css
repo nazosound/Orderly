@@ -1,3 +1,25 @@
 /* You can add global styles to this file, and also import other style files */
 @import "tailwindcss";
-@import "tailwindcss-primeui";
+@plugin "tailwindcss-primeui";
+:root {
+  color-scheme: light !important;
+}
+
+body *:not(.fa) {
+  font-family: "Source Sans 3", sans-serif;
+  font-optical-sizing: auto;
+}
+
+:root {
+  --surface-a: white;
+  --surface-b: #f8f9fa;
+  --surface-c: #e9ecef;
+  --surface-d: #dee2e6;
+  --surface-e: white;
+  --surface-f: white;
+  --text-color: #495057;
+  --text-color-secondary: #6c757d;
+  --primary-color: #3b82f6;
+  --primary-color-text: #ffffff;
+  --p-dialog-background: #ffffff;
+}

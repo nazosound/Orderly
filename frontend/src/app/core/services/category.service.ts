@@ -5,11 +5,12 @@ import { BehaviorSubject, map, Observable, switchMap } from 'rxjs';
 import { EndResultInterface } from '../../shared/models/endresult.interface';
 import { PaginationInterface } from '../../shared/models/pagination.interface';
 
+
 @Injectable({
   providedIn: 'root',
 })
 export class CategoryService {
-  private reload$ = new BehaviorSubject<number>(1);
+  private reloadCategories$ = new BehaviorSubject<{ page: number, search: string }>({ page: 1, search: '' });
   api = inject(ApiService);
 
   saveCategory(category: CategoryInterface): Observable<CategoryInterface> {
@@ -36,11 +37,13 @@ export class CategoryService {
     );
   }
 
+
+
   getAllCategories(): Observable<PaginationInterface<CategoryInterface[]>> {
-    return this.reload$.asObservable().pipe(
-      switchMap((page: number) =>
+    return this.reloadCategories$.asObservable().pipe(
+      switchMap((data) =>
         this.api.httpGet<PaginationInterface<CategoryInterface[]>>(
-          `Category/GetAllCategories?page=${page}`
+          `Category/GetAllCategories?page=${data.page}&search=${data.search}`
         )
       ),
       map((result) => {
@@ -52,7 +55,7 @@ export class CategoryService {
     );
   }
 
-  reloadCategories(page: number): void {
-    this.reload$.next(page);
+  reloadCategories(page: number, search: string): void {
+    this.reloadCategories$.next({ page: page, search: search });
   }
 }

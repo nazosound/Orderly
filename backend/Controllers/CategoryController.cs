@@ -13,16 +13,16 @@ namespace backend.Controllers
         [HttpGet]
         [Authorize(Roles = $"{CONSTANTS.ADMIN}")]
         [Route("getAllCategories")]
-        public async Task<IActionResult> GetAllCategories(int page = 1)
+        public async Task<IActionResult> GetAllCategories(int page = 1,string search = "")
         {
-            var result = await categoryService.GetAllCategories(page);
+            var result = await categoryService.GetAllCategories(page,search);
             return End(true, "", result);
         }
 
         [HttpGet]
         [Authorize(Roles = $"{CONSTANTS.ADMIN}{CONSTANTS.SALES}")]
         [Route("getCategories")]
-        public async Task<IActionResult> getCategories()
+        public async Task<IActionResult> GetCategories()
         {
             return End(true, "", await categoryService.GetActiveCategories());
         }
