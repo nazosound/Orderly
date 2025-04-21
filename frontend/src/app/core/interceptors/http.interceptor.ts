@@ -41,9 +41,9 @@ export class TokenInterceptor implements HttpInterceptor {
     let accessToken = this.authService.jwt();
     return accessToken
       ? req.clone({
-          headers: req.headers.set('Authorization', `Bearer ${accessToken}`),
-          withCredentials: true,
-        })
+        headers: req.headers.set('Authorization', `Bearer ${accessToken}`),
+        withCredentials: true,
+      })
       : req.clone({ withCredentials: true });
   }
 

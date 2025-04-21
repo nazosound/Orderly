@@ -1,22 +1,24 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { map, Observable } from 'rxjs';
-import { ApiService } from './api.service';
+import { catchError, map, Observable, of } from 'rxjs';
 import { LoginResponse } from '../../shared/models/login.model';
 import { UserSession } from '../../shared/models/userSession.interface';
 import { UserInterface } from '../../shared/models/user.model';
 import { EndResultInterface } from '../../shared/models/endresult.interface';
+import { ApiService } from './shared/api.service';
+import { HttpParams } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+
   router = inject(Router);
   api = inject(ApiService);
 
   session = signal<UserSession | null>(this.loadSession());
-  user = computed(() => (this.session() ? this.session()!.user : null));
-  jwt = computed(() => (this.session() ? this.session()!.jwt : null));
+  user = computed(() => this.session()?.user);
+  jwt = computed(() => this.session()?.jwt);
   isAuth = computed(() => this.session() != null);
 
   login(email: string, password: string): Observable<LoginResponse> {
@@ -45,6 +47,14 @@ export class AuthService {
         }
         return result.data;
       })
+    );
+  }
+
+  hasRoleAccess(expectedRoles: string[]): Observable<boolean> {
+    const params = new HttpParams().set('roles', expectedRoles.join(','));
+    return this.api.httpGet<EndResultInterface<number | null>>('Auth/HasAccess', params).pipe(
+      map((response) => response.result),
+      catchError(() => of(false))
     );
   }
 

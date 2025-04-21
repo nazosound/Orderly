@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
-import { ApiService } from './api.service';
 import { UserInterface } from '../../shared/models/user.model';
 import { map, Observable } from 'rxjs';
 import { EndResultInterface } from '../../shared/models/endresult.interface';
+import { ApiService } from './shared/api.service';
 
 @Injectable({
   providedIn: 'root',

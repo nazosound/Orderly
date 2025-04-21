@@ -3,4 +3,5 @@ export interface EndResultInterface<T> {
   message: string;
   data: T;
   statusCode: number;
+  error: string;
 }

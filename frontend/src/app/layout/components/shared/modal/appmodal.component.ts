@@ -1,5 +1,6 @@
+import { LangService } from '@/core/services/shared/lang.service';
 import { NgIf } from '@angular/common';
-import { Component, input, model, output } from '@angular/core';
+import { Component, inject, input, model, output } from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
 
 
@@ -16,19 +17,20 @@ import { DialogModule } from 'primeng/dialog';
             (click)="closeModal()"
             class="bg-red-500 text-white px-4 py-2 rounded-md"
           >
-            Close
+            {{words.CLOSE_BUTTON_TEXT}}
           </button>
         </div> 
     </p-dialog>
   `,
 })
 export class AppModalComponent {
-  title = input<string>('');
+  words = inject(LangService).words();
   isOpen = model(false);
-  close = output();
+  title = input<string>('');
   widthClass = input<string>('w-4/12');
   showButton = input<boolean>(true);
   position = input<"center" | "top" | "bottom" | "left" | "right" | "topleft" | "topright" | "bottomleft" | "bottomright">('top');
+  close = output();
 
   closeModal() {
     this.close.emit();

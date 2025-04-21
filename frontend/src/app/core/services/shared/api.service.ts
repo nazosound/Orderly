@@ -1,7 +1,7 @@
+import { EndResultInterface } from '@/shared/models/endresult.interface';
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
-import { EndResultInterface } from '../../shared/models/endresult.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -11,9 +11,10 @@ export class ApiService {
 
   http = inject(HttpClient);
 
-  httpGet<T>(method: string): Observable<EndResultInterface<T>> {
+  httpGet<T>(method: string, params: any = null): Observable<EndResultInterface<T>> {
     return this.http.get<EndResultInterface<T>>(`${this.baseUrl}${method}`, {
       withCredentials: true,
+      params: params
     });
   }
 

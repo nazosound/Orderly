@@ -6,7 +6,7 @@ public class CONSTANTS
     public const string ADMIN = "ADMINISTRADOR";
     public const string USER = "USUARIO";
     public const string SALES = "SALES";
-    public const int PAGESIZE = 10;
+    public const int PAGESIZE = 2;
 
     public const string SUCCESS = "Success transaction";
     public const string ERROR = "There was an error completing the transaction";

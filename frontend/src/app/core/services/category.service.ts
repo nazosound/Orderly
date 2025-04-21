@@ -1,20 +1,61 @@
-import { inject, Injectable } from '@angular/core';
-import { CategoryInterface } from '../../shared/models/category.interface';
-import { ApiService } from './api.service';
+import { computed, inject, Injectable, linkedSignal, model, ResourceStatus, Signal, signal } from '@angular/core';
+import { CategoryInterface } from '@/shared/models/category.interface';
+import { EndResultInterface } from '@/shared/models/endresult.interface';
+import { PaginationInterface } from '@/shared/models/pagination.interface';
 import { BehaviorSubject, map, Observable, switchMap } from 'rxjs';
-import { EndResultInterface } from '../../shared/models/endresult.interface';
-// import { httpResources } from '@angular/common/http';
-
-
-import { PaginationInterface } from '../../shared/models/pagination.interface';
+import { httpResource } from '@angular/common/http';
+import { LangService } from './shared/lang.service';
+import { ApiService } from './shared/api.service';
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class CategoryService {
-  private reloadCategories$ = new BehaviorSubject<{ page: number, search: string }>({ page: 1, search: '' });
+
+  words = inject(LangService).words();
   api = inject(ApiService);
+  currentPage = signal<number>(1);
+  search = signal('');
+
+
+  private categoryResource = httpResource<EndResultInterface<PaginationInterface<CategoryInterface[]>>>(() => ({
+    url: this.api.baseUrl + 'Category/GetAllCategories',
+    params: {
+      page: this.currentPage(),
+      search: this.search(),
+    },
+  }));
+
+  error = computed<any>(() => {
+    return this.categoryResource.error();
+  });
+
+
+  categoryList = linkedSignal<CategoryInterface[] | undefined, CategoryInterface[]>({
+    source: () => this.categoryResource.value()?.data?.items,
+    computation: (newvalue, previous) => {
+      if (newvalue) {
+        return newvalue;
+      }
+      return previous?.value as CategoryInterface[];
+    }
+  });
+
+  totalPages = linkedSignal<number, number>({
+    source: () => this.categoryResource.value()?.data?.totalPages ?? 0,
+    computation: (newvalue, previous) => {
+      if (newvalue) {
+        return newvalue;
+      }
+      return (previous?.value as number);
+    }
+  });
+
+  loading = computed(() => {
+    return this.categoryResource.status() === ResourceStatus.Loading;
+  });
+
 
   saveCategory(category: CategoryInterface): Observable<CategoryInterface> {
     return this.api
@@ -40,25 +81,19 @@ export class CategoryService {
     );
   }
 
-
-
-  getAllCategories(): Observable<PaginationInterface<CategoryInterface[]>> {
-    return this.reloadCategories$.asObservable().pipe(
-      switchMap((data) =>
-        this.api.httpGet<PaginationInterface<CategoryInterface[]>>(
-          `Category/GetAllCategories?page=${data.page}&search=${data.search}`
-        )
-      ),
-      map((result) => {
-        if (result.result === false) {
-          throw new Error(result.message);
-        }
-        return result.data;
-      })
-    );
+  resetCategoryList() {
+    this.currentPage.set(0);
+    this.currentPage.set(1);
+    this.search.set('');
   }
 
-  reloadCategories(page: number, search: string): void {
-    this.reloadCategories$.next({ page: page, search: search });
+  categoryTableColumns() {
+    return [
+      this.words.CATEGORY_TABLE_ITEM_ID,
+      this.words.CATEGORY_TABLE_ITEM_CATEGORY_NAME,
+      this.words.CATEGORY_TABLE_ITEM_STATUS,
+      this.words.CATEGORY_TABLE_ITEM_SELECT
+    ];
   }
+
 }

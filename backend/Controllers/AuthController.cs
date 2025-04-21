@@ -67,4 +67,18 @@ public class AuthController(AuthService authService) : BaseController
         await authService.Logout(userId.Value);
         return End();
     }
+
+    [Authorize]
+    [HttpGet]
+    [Route("HasAccess")]
+    public IActionResult HasAccess([FromQuery] string[] roles)
+    {
+        if (roles.Length == 0) return End(CONSTANTS.FORBID);
+        if (roles.Select(s => s.ToLower()).Contains(UserRole?.ToLower()))
+        {
+            return End(true, CONSTANTS.SUCCESS, 200);
+        }
+
+        return End(CONSTANTS.FORBID);
+    }
 }

@@ -1,14 +1,23 @@
 import { Routes } from '@angular/router';
-import { DashboardComponent } from '../../layout/pages/dashboard/dashboard.component';
 import { AuthGuard } from '../../core/guards/auth.guard';
+import CategoryComponent from '@/layout/pages/categories/category-list.component';
+import { RoleGuard } from '@/core/guards/role.guard';
 
 export const dashboardRoutes: Routes = [
   {
     path: 'categories',
-    loadComponent: () =>
-      import('../../layout/pages/categories/category.component').then(
-        (m) => m.CategoryComponent
-      ),
-    canActivate: [AuthGuard],
+    loadComponent: () => CategoryComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: ['ADMINISTRADOR']
+    }
+
+  }, {
+    path: 'accounts',
+    loadComponent: () => CategoryComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: ['SALES']
+    }
   },
 ];

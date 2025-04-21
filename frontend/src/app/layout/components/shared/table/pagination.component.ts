@@ -1,5 +1,4 @@
 import { Component, input, output } from '@angular/core';
-import { AppButtonComponent } from './appbutton.component';
 
 @Component({
   selector: 'app-pagination',
